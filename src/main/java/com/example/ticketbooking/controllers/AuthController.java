@@ -19,6 +19,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,7 @@ import java.util.List;
 import java.util.Optional;
 
 @AllArgsConstructor
-@RestController
+@RestController("/api/auth")
 @Slf4j
 public class AuthController {
 
@@ -44,7 +45,7 @@ public class AuthController {
     private final AuthService authService;
 
 
-    @PostMapping("/api/auth/login")
+    @PostMapping("/login")
     public ResponseEntity<AuthResponseDto> loginController(@RequestBody LoginDto loginDto) {
 
         String jwtToken = authService.login(loginDto);
@@ -53,14 +54,18 @@ public class AuthController {
                 .status(HttpStatus.OK)
                 .body(authResponseDto);
     }
-    @PostMapping("/api/auth/signup")
+    @PostMapping("/signup")
     public ResponseEntity<AuthResponseDto> signupController(@RequestBody RegisterDto registerDto){
-
         try{
             String jwtToken = authService.signup(registerDto);
-            AuthResponseDto authResponseDto = new AuthResponseDto(jwtToken,AuthStatus.USER_CREATED);
+
+            AuthStatus authStatus = (jwtToken==null) ? AuthStatus.USER_NOT_CREATED : AuthStatus.USER_CREATED;
+
+            HttpStatus httpStatus = (jwtToken==null) ? HttpStatus.CONFLICT : HttpStatus.OK;
+
+            AuthResponseDto authResponseDto = new AuthResponseDto(jwtToken,authStatus);
             return ResponseEntity
-                    .status(HttpStatus.OK)
+                    .status(httpStatus)
                     .body(authResponseDto);
         }catch (Exception e){
             AuthResponseDto authResponseDto = new AuthResponseDto(null,AuthStatus.USER_NOT_CREATED);

@@ -7,6 +7,7 @@ import com.example.ticketbooking.entities.Role;
 import com.example.ticketbooking.entities.UserEntity;
 import com.example.ticketbooking.repositories.RoleRepository;
 import com.example.ticketbooking.repositories.UserRepository;
+import com.example.ticketbooking.util.JwtUtils;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -33,28 +35,38 @@ public class AuthServiceImpl implements AuthService{
     @Override
     public String login(LoginDto loginDto) {
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(
-                loginDto.getUsername(),
-                loginDto.getPassword()
-        );
-        Authentication userAuthentication =authenticationManager.authenticate(authentication);
+        Authentication authenticationToken = new UsernamePasswordAuthenticationToken(loginDto.getUsername(),loginDto.getPassword());
+        Authentication authenticatedToken = authenticationManager.authenticate(authenticationToken);
+
+        String authenticatedUserName = ((UserDetails)(authenticatedToken.getPrincipal())).getUsername();
+
+        return JwtUtils.generateToken(authenticatedUserName);
+
     }
 
     @Override
     public String signup(RegisterDto registerDto) {
-        if(userRepository.existsByUsername(registerDto.getUsername())){
-            throw new RuntimeException("user already exists");
-        }
-        Role role = roleRepository.findByName("USER");
-        List<Role> roles = new ArrayList<>();
-        roles.add(role);
+        log.info("inside the singup method , username :{}",registerDto.getUsername());
+        try {
+            if(userRepository.existsByUsername(registerDto.getUsername())){
+                throw new RuntimeException("user already exists");
+            }
+            Role role = roleRepository.findByName("USER");
+            List<Role> roles = new ArrayList<>();
+            roles.add(role);
 
-        UserEntity user = UserEntity.builder()
-                .username(registerDto.getUsername())
-                .password(passwordEncoder.encode(registerDto.getPassword()))
-                .roles(roles)
-                .build();
-        userRepository.save(user);
+            UserEntity user = UserEntity.builder()
+                    .username(registerDto.getUsername())
+                    .password(passwordEncoder.encode(registerDto.getPassword()))
+                    .roles(roles)
+                    .build();
+            userRepository.save(user);
+            return JwtUtils.generateToken(registerDto.getUsername());
+        } catch (Exception e) {
+            log.info(String.valueOf(e));
+        }
+        return null;
+
 
     }
 }
