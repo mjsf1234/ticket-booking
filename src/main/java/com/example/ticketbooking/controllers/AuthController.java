@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Optional;
 
 @AllArgsConstructor
-@RestController("/api/auth")
+@RestController
 @Slf4j
 public class AuthController {
 
@@ -45,16 +45,15 @@ public class AuthController {
     private final AuthService authService;
 
 
-    @PostMapping("/login")
+    @PostMapping("/api/auth/login")
     public ResponseEntity<AuthResponseDto> loginController(@RequestBody LoginDto loginDto) {
-
         String jwtToken = authService.login(loginDto);
         AuthResponseDto authResponseDto = new AuthResponseDto(jwtToken, AuthStatus.LOGIN_SUCCESSFULLY);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(authResponseDto);
     }
-    @PostMapping("/signup")
+    @PostMapping("/api/auth/signup")
     public ResponseEntity<AuthResponseDto> signupController(@RequestBody RegisterDto registerDto){
         try{
             String jwtToken = authService.signup(registerDto);
