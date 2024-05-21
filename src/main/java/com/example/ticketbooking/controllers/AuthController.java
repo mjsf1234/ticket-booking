@@ -74,4 +74,9 @@ public class AuthController {
         }
 
     }
+
+    @GetMapping("/api/home")
+    public ResponseEntity<String> homePageController(@RequestBody String s){
+        return ResponseEntity.ok("<h1>Hello</h1>");
+    }
 }
