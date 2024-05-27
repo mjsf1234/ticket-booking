@@ -10,5 +10,6 @@ COPY target/ticket-booking-0.0.1-SNAPSHOT.jar /app/authentication-service.jar
 # Expose the port that your Java service listens on
 EXPOSE 8080
 
+
 # Set the entry point for the container
 ENTRYPOINT ["java", "-jar", "/app/authentication-service.jar"]

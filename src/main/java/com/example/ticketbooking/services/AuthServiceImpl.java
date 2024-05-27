@@ -3,18 +3,14 @@ package com.example.ticketbooking.services;
 
 import com.example.ticketbooking.dto.LoginDto;
 import com.example.ticketbooking.dto.RegisterDto;
+import com.example.ticketbooking.entities.ApplicationUser;
 import com.example.ticketbooking.entities.Role;
-import com.example.ticketbooking.entities.UserEntity;
 import com.example.ticketbooking.repositories.RoleRepository;
 import com.example.ticketbooking.repositories.UserRepository;
 import com.example.ticketbooking.util.JwtUtils;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -55,7 +51,7 @@ public class AuthServiceImpl implements AuthService{
             List<Role> roles = new ArrayList<>();
             roles.add(role);
 
-            UserEntity user = UserEntity.builder()
+            ApplicationUser user = ApplicationUser.builder()
                     .username(registerDto.getUsername())
                     .password(passwordEncoder.encode(registerDto.getPassword()))
                     .roles(roles)
