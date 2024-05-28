@@ -1,7 +1,7 @@
 package com.example.ticketbooking.services;
 
 import com.example.ticketbooking.entities.ApplicationUser;
-import com.example.ticketbooking.repositories.UserRepository;
+import com.example.ticketbooking.repositories.AppUserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    private final UserRepository userRepository;
+    private final AppUserRepository userRepository;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         log.info("inside the : loadUserByUsername username : {}", username);
