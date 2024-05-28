@@ -5,12 +5,13 @@ import com.example.ticketbooking.dto.LoginDto;
 import com.example.ticketbooking.dto.RegisterDto;
 import com.example.ticketbooking.enums.AuthStatus;
 import com.example.ticketbooking.repositories.RoleRepository;
-import com.example.ticketbooking.repositories.UserRepository;
+import com.example.ticketbooking.repositories.AppUserRepository;
 import com.example.ticketbooking.services.AuthService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class AuthController {
 
-    private final UserRepository userRepository;
+    private final AppUserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
@@ -63,5 +64,10 @@ public class AuthController {
     @GetMapping("/api/home")
     public ResponseEntity<String> homePageController(@RequestBody String s){
         return ResponseEntity.ok("<h1>Hello</h1>");
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/ping")
+    public ResponseEntity<String> pingController(){
+        return ResponseEntity.ok("<h1>Hello from backend</h1>");
     }
 }

@@ -6,7 +6,7 @@ import com.example.ticketbooking.dto.RegisterDto;
 import com.example.ticketbooking.entities.ApplicationUser;
 import com.example.ticketbooking.entities.Role;
 import com.example.ticketbooking.repositories.RoleRepository;
-import com.example.ticketbooking.repositories.UserRepository;
+import com.example.ticketbooking.repositories.AppUserRepository;
 import com.example.ticketbooking.util.JwtUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,15 +17,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @AllArgsConstructor
 @Slf4j
 @Service
 public class AuthServiceImpl implements AuthService{
     private final AuthenticationManager authenticationManager;
-    private final UserRepository userRepository;
+    private final AppUserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     @Override
@@ -42,18 +42,20 @@ public class AuthServiceImpl implements AuthService{
 
     @Override
     public String signup(RegisterDto registerDto) {
-        log.info("inside the singup method , username :{}",registerDto.getUsername());
+        log.info("inside the signup method , username :{}",registerDto.getUsername());
         try {
             if(userRepository.existsByUsername(registerDto.getUsername())){
                 throw new RuntimeException("user already exists");
             }
             Role role = roleRepository.findByName("USER");
-            List<Role> roles = new ArrayList<>();
+            Set<Role> roles = new HashSet<>();
             roles.add(role);
 
             ApplicationUser user = ApplicationUser.builder()
                     .username(registerDto.getUsername())
                     .password(passwordEncoder.encode(registerDto.getPassword()))
+                    .email(registerDto.getEmail())
+                    .mobileNumber(registerDto.getMobileNumber())
                     .roles(roles)
                     .build();
             userRepository.save(user);
@@ -62,7 +64,5 @@ public class AuthServiceImpl implements AuthService{
             log.info(String.valueOf(e));
         }
         return null;
-
-
     }
 }
