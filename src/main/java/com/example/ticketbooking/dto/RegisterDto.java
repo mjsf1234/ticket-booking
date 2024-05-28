@@ -1,4 +1,5 @@
 package com.example.ticketbooking.dto;
+import com.example.ticketbooking.enums.Roles;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
@@ -9,4 +10,5 @@ public class RegisterDto {
     @JsonProperty("contact_number")
     private Long mobileNumber;
     private String email;
+    private String role;
 }

@@ -47,7 +47,7 @@ public class AuthServiceImpl implements AuthService{
             if(userRepository.existsByUsername(registerDto.getUsername())){
                 throw new RuntimeException("user already exists");
             }
-            Role role = roleRepository.findByName("USER");
+            Role role = roleRepository.findByName(registerDto.getRole());
             Set<Role> roles = new HashSet<>();
             roles.add(role);
 
