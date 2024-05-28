@@ -31,6 +31,7 @@ public class ApplicationUserDetails extends ApplicationUser implements UserDetai
     private boolean enabled = true;
 
     public ApplicationUserDetails(ApplicationUser byUsername) {
+//
         this.username = byUsername.getUsername();
         this.password= byUsername.getPassword();
         List<GrantedAuthority> auths = new ArrayList<>();
@@ -46,6 +47,7 @@ public class ApplicationUserDetails extends ApplicationUser implements UserDetai
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
     }
+
 
     @Override
     public String getPassword() {
