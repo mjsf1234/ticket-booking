@@ -2,11 +2,15 @@ package com.example.ticketbooking.controllers;
 
 import com.example.ticketbooking.dto.AuthResponseDto;
 import com.example.ticketbooking.dto.LoginDto;
+import com.example.ticketbooking.dto.RefreshTokenRequestDto;
 import com.example.ticketbooking.dto.RegisterDto;
+import com.example.ticketbooking.entities.RefreshToken;
 import com.example.ticketbooking.enums.AuthStatus;
 import com.example.ticketbooking.repositories.RoleRepository;
 import com.example.ticketbooking.repositories.AppUserRepository;
 import com.example.ticketbooking.services.AuthService;
+import com.example.ticketbooking.services.RefreshTokenServiceImpl;
+import com.example.ticketbooking.util.JwtUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -29,12 +33,18 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final AuthService authService;
+    private final RefreshTokenServiceImpl refreshTokenService;
 
 
     @PostMapping("/api/auth/login")
     public ResponseEntity<AuthResponseDto> loginController(@RequestBody LoginDto loginDto) {
         String jwtToken = authService.login(loginDto);
-        AuthResponseDto authResponseDto = new AuthResponseDto(jwtToken, AuthStatus.LOGIN_SUCCESSFULLY);
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(loginDto.getUsername());
+        AuthResponseDto authResponseDto = new AuthResponseDto(
+                jwtToken,
+                refreshToken.getRefreshToken(),
+                AuthStatus.LOGIN_SUCCESSFULLY
+        );
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(authResponseDto);
@@ -48,18 +58,55 @@ public class AuthController {
 
             HttpStatus httpStatus = (jwtToken==null) ? HttpStatus.CONFLICT : HttpStatus.OK;
 
-            AuthResponseDto authResponseDto = new AuthResponseDto(jwtToken,authStatus);
+            RefreshToken refreshToken =refreshTokenService.createRefreshToken(registerDto.getUsername());
+
+            AuthResponseDto authResponseDto = new AuthResponseDto(
+                    jwtToken,
+                    refreshToken.getRefreshToken(),
+                    authStatus
+            );
+
             return ResponseEntity
                     .status(httpStatus)
                     .body(authResponseDto);
         }catch (Exception e){
-            AuthResponseDto authResponseDto = new AuthResponseDto(null,AuthStatus.USER_NOT_CREATED);
+            AuthResponseDto authResponseDto = new AuthResponseDto(
+                    null,
+                    null,
+                    AuthStatus.USER_NOT_CREATED
+            );
+
             return ResponseEntity
                     .status(HttpStatus.CONFLICT)
                     .body(authResponseDto);
         }
 
     }
+
+    @PostMapping("/api/refreshToken")
+    public ResponseEntity<AuthResponseDto> refreshTokenController(@RequestBody RefreshTokenRequestDto refreshTokenRequestDto){
+
+            return refreshTokenService.findbyToken(refreshTokenRequestDto.getToken())
+                    .map(refreshTokenService::verifyTokenExpiry)
+                    .map(RefreshToken::getAppUser)
+                    .map(appUserInfo->{
+                        String jwtToken  = JwtUtils.generateToken(appUserInfo.getUsername());
+                        RefreshToken refreshToken = refreshTokenService.createRefreshToken(appUserInfo.getUsername());
+
+                        AuthResponseDto authResponseDto =  new AuthResponseDto(
+                                jwtToken,
+                                refreshToken.getRefreshToken(),
+                                AuthStatus.AUTHORISED
+                        );
+                        return ResponseEntity
+                                .status(HttpStatus.OK)
+                                .body(authResponseDto);
+
+
+                    }).orElseThrow(() ->new RuntimeException("Refresh Token not found"));
+
+    }
+
 
     @GetMapping("/api/home")
     public ResponseEntity<String> homePageController(@RequestBody String s){

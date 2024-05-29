@@ -32,6 +32,7 @@ public class SecurityConfig {
                 requestMatcher -> requestMatcher
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/auth/signup").permitAll()
+                        .requestMatchers("/api/refreshToken").permitAll()
                         .anyRequest().authenticated()
         );
         http.exceptionHandling(
