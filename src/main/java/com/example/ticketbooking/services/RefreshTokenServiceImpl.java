@@ -22,6 +22,9 @@ public class RefreshTokenServiceImpl implements RefreshTokenService{
     @Override
     public RefreshToken createRefreshToken(String userName) {
         // check if user has token and not expired
+        Optional<RefreshToken> refreshTokenOptional = refreshTokenRepository.findByAppUser_Username(userName);
+
+        refreshTokenOptional.ifPresent(refreshTokenRepository::delete);
 
         RefreshToken refreshToken = RefreshToken.builder()
                 .refreshToken(UUID.randomUUID().toString())
