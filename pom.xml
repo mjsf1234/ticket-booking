@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>ticket-booking</artifactId>
+	<artifactId>AuthService</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>ticket-booking</name>
 	<description>Demo project for Spring Boot</description>
@@ -79,6 +79,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>authservice</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
