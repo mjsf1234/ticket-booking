@@ -33,6 +33,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/auth/signup").permitAll()
                         .requestMatchers("/api/refreshToken").permitAll()
+                        .requestMatchers("/ping").permitAll()
                         .anyRequest().authenticated()
         );
         http.exceptionHandling(
