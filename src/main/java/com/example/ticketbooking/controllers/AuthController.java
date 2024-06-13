@@ -1,5 +1,6 @@
 package com.example.ticketbooking.controllers;
 
+import com.example.ticketbooking.config.KafkaProducerService;
 import com.example.ticketbooking.dto.AuthResponseDto;
 import com.example.ticketbooking.dto.LoginDto;
 import com.example.ticketbooking.dto.RefreshTokenRequestDto;
@@ -35,7 +36,6 @@ public class AuthController {
     private final AuthService authService;
     private final RefreshTokenServiceImpl refreshTokenService;
 
-
     @PostMapping("/api/auth/login")
     public ResponseEntity<AuthResponseDto> loginController(@RequestBody LoginDto loginDto) {
         String jwtToken = authService.login(loginDto);
@@ -65,6 +65,7 @@ public class AuthController {
                     refreshToken.getRefreshToken(),
                     authStatus
             );
+
 
             return ResponseEntity
                     .status(httpStatus)
